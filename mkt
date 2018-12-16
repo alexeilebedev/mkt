@@ -1,0 +1,72 @@
+#!/usr/local/bin/perl
+# show stock quotes from multiple sources
+# input file is specified as an argument, default being data/mkt
+use strict;
+use JSON;
+use File::Basename;
+use strict;
+use POSIX qw(strftime);
+use Getopt::Long;
+my $dirname  = dirname(__FILE__);
+$dirname = "./$dirname" if ($dirname !~ /^\./);
+require "$dirname/pair.pl";
+require "$dirname/mkt-ecb.pl";
+require "$dirname/mkt-iex.pl";
+require "$dirname/mkt-hitbtc.pl";
+my $filename="data/symbol";
+my $def_ccy = "USD";
+
+my $usage="Usage: $0 <options>
+    -f <filename>      File with desired symbols. Default $filename
+    -ccy <ccy>         Target currency in which to display output. Default $def_ccy
+";
+GetOptions("f=s" => \$filename
+	   ,"ccy=s" => \$def_ccy)
+    or die $usage;
+
+set_def_ccy($def_ccy);
+open my $R, "<$filename" or
+    die "can't read [$filename]: $!\n";
+
+#-------------------------------------------------------------------------------
+# fetch JSON from given URL, return parsed object
+sub fetch_json {
+    my $url=$_[0];
+    my $text=`curl -s '$url'`;
+    if ($ENV{VERBOSE}>0){
+	print "curl -s '$url'\n";
+	print "$text\n";
+    }
+    my $obj= decode_json( $text);
+    return $obj;
+}
+
+#-------------------------------------------------------------------------------
+# Main body
+
+my @reqs;
+while (<$R>){
+    chomp;
+    my ($pair,$source)=split(/\s+/);
+    if ($source eq "hitbtc"){
+	hitbtc_fetch_quote($pair);
+    } elsif ($source eq "iex"){
+	iex_begin_fetch($pair);
+    } elsif ($source eq "ecb"){
+	ecb_fetch_quote($pair);
+    } else {
+	print STDERR "bad source [$source]\n";
+    }
+    push(@reqs,{pair=>$pair,source=>$source});
+}
+iex_end_fetch(); # uses batch mode
+build_implied();
+build_implied();
+
+print "Times are in GMT. Currency is ".get_def_ccy()."\n";
+foreach my $req(@reqs) {
+    my ($pair,$source)=($req->{pair},$req->{source});
+    $pair = with_def_ccy($pair);
+    my ($price,$time) = get_quote($pair);
+    printf("%-8s  %10.5f   %-20s\n",without_def_ccy($pair),$price,$time);
+}
