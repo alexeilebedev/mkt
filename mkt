@@ -13,6 +13,7 @@ require "$dirname/pair.pl";
 require "$dirname/mkt-ecb.pl";
 require "$dirname/mkt-iex.pl";
 require "$dirname/mkt-hitbtc.pl";
+require "$dirname/mkt-ustreasury.pl";
 my $filename="data/symbol";
 my $def_ccy = "USD";
 
@@ -54,6 +55,8 @@ while (<$R>){
 	iex_begin_fetch($pair);
     } elsif ($source eq "ecb"){
 	ecb_fetch_quote($pair);
+    } elsif ($source eq "ustreasury"){
+	ustreasury_fetch_quote($pair);
     } else {
 	print STDERR "bad source [$source]\n";
     }
