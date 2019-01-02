@@ -8,7 +8,6 @@ use strict;
 use POSIX qw(strftime);
 use Getopt::Long;
 my $dirname  = dirname(__FILE__);
-$dirname = "./$dirname" if ($dirname !~ /^\./);
 require "$dirname/pair.pl";
 require "$dirname/mkt-ecb.pl";
 require "$dirname/mkt-iex.pl";
