@@ -34,7 +34,7 @@ sub ecb_fetch() {
 	my $symbol=$headers[$i];
 	my $price=$data[$i];
 	if ($symbol) {
-	    def_exchange("EUR/$symbol",$price,$timestr);
+	    def_exchange("EUR/$symbol",$price,$timestr,"");
 	}
     }
 }

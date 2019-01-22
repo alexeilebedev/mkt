@@ -13,7 +13,7 @@ sub hitbtc_fetch_quote(@) {
 	    my $querysym = $symbol;
 	    $querysym =~ s!/!!;	# BTC/USD -> BTCUSD
 	    my $obj=fetch_json("https://api.hitbtc.com/api/2/public/ticker/$querysym");
-	    def_exchange($symbol, $obj->{last}, $obj->{timestamp});
+	    def_exchange($symbol, $obj->{last}, $obj->{timestamp}, $obj->{comment});
 	}
     }
 }

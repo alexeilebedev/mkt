@@ -45,13 +45,18 @@ sub getpair($) {
 # define exchange rate for pair $_[0]
 # to be $_[1] at time $_[2]
 # time is just a string
-sub def_exchange($$$) {
+sub def_exchange($$$$) {
     my ($a,$b) = getpair($_[0]);
     my $price=$_[1];
     my $time=$_[2];
+    my $comment=$_[3];
     #print "$a/$b -> $price\n";
     if ($a && $b && $price != 0.0) {
-	$pairdb->{"$a/$b"} = { time => $time, price => $price };
+	$pairdb->{"$a/$b"} = {
+	    time => $time
+		, price => $price
+		, comment => $comment
+	};
 	if ($a ne $b) {
 	    $pairdb->{"$b/$a"} = { time => $time, price => 1.0 / $price };
 	}
@@ -67,14 +72,14 @@ sub def_exchange($$$) {
 #-------------------------------------------------------------------------------
 
 # retrieve exchange rate for $_[0]
-# result is ($price,$time) or undef
+# result is ($price,$time,$comment) or undef
 sub get_quote($) {
     my $rec = $pairdb->{$_[0]};
     #print "getquote $_[0]  $rec->{price}  $rec->{time}\n";
     if (!$rec) {
 	return undef;
     }
-    return ($rec->{price},$rec->{time});
+    return ($rec->{price},$rec->{time},$rec->{comment});
 }
 
 #-------------------------------------------------------------------------------
@@ -97,7 +102,7 @@ sub build_implied() {
 		    my $p1 = $pairdb->{"$a/$b"};
 		    my $p2 = $pairdb->{"$c/$a"};
 		    if ($p1 && $p2) {
-			def_exchange("$c/$b", $p1->{price}*$p2->{price}, $p1->{time});
+			def_exchange("$c/$b", $p1->{price}*$p2->{price}, $p1->{time}, "via $a");
 		    }
 		}
 	    }

@@ -45,7 +45,7 @@ sub ustreasury_fetch() {
 		my @words=split(/\s+/);
 		my $timestr = strftime("%Y-%m-%dT%H:%M:%S",gmtime(str2time($words[0])));
 		my $price = $words[scalar(@words)-1];
-		def_exchange("TB52/1",$price,$timestr);
+		def_exchange("TB52/1",$price,$timestr,"");
 		$nquote++;
 	    } else {
 		if ($nquote>0) {

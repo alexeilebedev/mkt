@@ -37,7 +37,13 @@ sub fetch_json {
 	print "curl -s '$url'\n";
 	print "$text\n";
     }
-    my $obj= decode_json( $text);
+    my $obj;
+    eval {
+	$obj = decode_json( $text);
+	1;
+    } or do {
+	$obj->{comment} = "$@";
+    };
     return $obj;
 }
 
@@ -69,6 +75,6 @@ print "Times are in GMT. Currency is ".get_def_ccy()."\n";
 foreach my $req(@reqs) {
     my ($pair,$source)=($req->{pair},$req->{source});
     $pair = with_def_ccy($pair);
-    my ($price,$time) = get_quote($pair);
-    printf("%-8s  %10.5f   %-20s\n",without_def_ccy($pair),$price,$time);
+    my ($price,$time,$comment) = get_quote($pair);
+    printf("%-8s  %10.5f   %-20s %s\n",without_def_ccy($pair),$price,$time,$comment);
 }

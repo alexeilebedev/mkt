@@ -25,7 +25,7 @@ sub iex_end_fetch {
 	foreach my $symbol(sort keys %$obj){
 	    if ($obj->{$symbol}){
 		my $quote=$obj->{$symbol}->{quote};
-		def_exchange("$symbol/USD", $quote->{latestPrice}, iex_timestamp_str($quote->{latestUpdate}));
+		def_exchange("$symbol/USD", $quote->{latestPrice}, iex_timestamp_str($quote->{latestUpdate}), $obj->{comment});
 	    }
 	}
     }
