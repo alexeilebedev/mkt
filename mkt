@@ -15,12 +15,15 @@ require "$dirname/mkt-hitbtc.pl";
 require "$dirname/mkt-ustreasury.pl";
 my $filename="data/symbol";
 my $def_ccy = "USD";
+my $edit=0;
 
 my $usage="Usage: $0 <options>
+    [-e]               Edit data file
     -f <filename>      File with desired symbols. Default $filename
     -ccy <ccy>         Target currency in which to display output. Default $def_ccy
 ";
 GetOptions("f=s" => \$filename
+	   ,"e" => \$edit
 	   ,"ccy=s" => \$def_ccy)
     or die $usage;
 
@@ -49,6 +52,13 @@ sub fetch_json {
 
 #-------------------------------------------------------------------------------
 # Main body
+
+if ($edit) {
+    my $editor=$ENV{EDITOR};
+    $editor or die "EDITOR is not set\n";
+    exit system("$editor data/symbol");
+    # EXIT SCRIPT HERE
+}
 
 my @reqs;
 while (<$R>){
